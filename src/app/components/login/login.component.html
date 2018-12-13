@@ -1,32 +1,41 @@
-<div class="container">
-  <div class="card card-container">
-    <!-- <img class="profile-img-card" src="//lh3.googleusercontent.com/-6V8xOA6M7BA/AAAAAAAAAAI/AAAAAAAAAAA/rzlHcD0KYwo/photo.jpg?sz=120" alt="" /> -->
-    <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
-    <p id="profile-name" class="profile-name-card"></p>
+<div *ngIf="isLoggedIn; else loggedOut">
+  Logged in as {{roles}}.
+</div>
 
-      <form name="form-signin" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
-      
-        <div class="alert alert-danger" role="alert" *ngIf="errorMessage">{{errorMessage}}</div>
-      	<span id="reauth-email" class="reauth-email"></span>
-      	<div class="form-group" [ngClass]="{ 'has-error': f.submitted && !tenant.valid }">
-        	<label for="tenant">Tenant</label>
-        	<input type="text" class="form-control" id="tenant" name="tenant" [(ngModel)]="user.tenant" #tenant="ngModel" required />
-        	<div *ngIf="f.submitted && !tenant.valid" class="help-block">Tenant is required</div>
-      	</div>
-      	<div class="form-group" [ngClass]="{ 'has-error': f.submitted && !username.valid }">
-        	<label for="username">Username</label>
-        	<input type="text" class="form-control" id="username" name="username" [(ngModel)]="user.username" #username="ngModel" required />
-        	<div *ngIf="f.submitted && !username.valid" class="help-block">Username is required</div>
-      	</div>     	
-      	<div class="form-group" [ngClass]="{ 'has-error': f.submitted && !password.valid }">
-	        <label for="password">Password</label>
-	        <input type="password" class="form-control" id="password" name="password" [(ngModel)]="user.password" #password="ngModel" required />
-	        <div *ngIf="f.submitted && !password.valid" class="help-block">Password is required</div>
-      	</div>
-	    <div id="remember" class="checkbox">
-	
-	    </div>
-      	<button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
-    </form><!-- /form -->
-  </div><!-- /card-container -->
-</div><!-- /container -->
+<ng-template #loggedOut>
+  <div class="row col-sm-6" style="max-width:350px;">
+    <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" name="username" [(ngModel)]="form.username" #username="ngModel"
+          required />
+        <div *ngIf="f.submitted && username.invalid">
+          <div *ngIf="username.errors.required">Username is required</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" name="password" [(ngModel)]="form.password" #password="ngModel"
+          required minlength="6" />
+        <div *ngIf="f.submitted && password.invalid">
+          <div *ngIf="password.errors.required">Password is required</div>
+          <div *ngIf="password.errors.minlength">Password must be at least 6 characters</div>
+        </div>
+			</div>
+			<div class="form-group">
+        <label for="tenant">Tenant</label>
+        <input type="text" class="form-control" name="tenant" [(ngModel)]="form.tenant" #tenant="ngModel"
+          required />
+        <div *ngIf="f.submitted && tenant.invalid">
+          <div *ngIf="tenant.errors.required">Tenant is required</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary">Login</button>
+        <div *ngIf="f.submitted && isLoginFailed" class="alert alert-danger">
+          Login failed: {{errorMessage}}
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
